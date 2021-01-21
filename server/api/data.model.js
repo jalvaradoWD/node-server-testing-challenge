@@ -3,12 +3,31 @@ const { validate } = require("uuid");
 const knex = require("../../data/db");
 
 const getData = async (req, res) => {
-  return res.json(await knex("testData").select("*"));
+  try {
+    return res.json(
+      await knex("testData")
+        .select("*")
+        .catch((error) => {
+          throw res.status(400).json({ err: error });
+        })
+    );
+  } catch (error) {
+    return error;
+  }
 };
 
 const createData = async (req, res) => {
-  const createdData = new FakeData();
-  await knex("testData").insert(createdData);
+  let createdData;
+  if (req.body) {
+    createdData = new FakeData(...req.body);
+  } else {
+    createdData = new FakeData();
+  }
+  await knex("testData")
+    .insert(createdData)
+    .catch((error) => {
+      throw res.status(400).json({ error });
+    });
   return res.json({ message: "Inserted data into the database" });
 };
 
@@ -30,7 +49,12 @@ const removeData = async (req, res) => {
       });
     }
 
-    await knex("testData").where({ id }).del();
+    await knex("testData")
+      .where({ id })
+      .del()
+      .catch((error) => {
+        throw res.status(400).json({ error });
+      });
 
     return res.json({ message: "Item has been deleted." });
   } catch (error) {

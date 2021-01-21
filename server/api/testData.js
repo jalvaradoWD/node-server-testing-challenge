@@ -2,11 +2,12 @@ const faker = require("faker");
 const { v4: uuid } = require("uuid");
 
 class FakeData {
-  constructor() {
-    this.id = uuid();
-    this.name = faker.name.findName();
-    this.email = faker.internet.email();
-    this.country = faker.address.country();
+  constructor(props) {
+    const { id, name, email, country } = { ...props };
+    this.id = id || uuid();
+    this.name = name || faker.name.findName();
+    this.email = email || faker.internet.email();
+    this.country = country || faker.address.country();
   }
 }
 
